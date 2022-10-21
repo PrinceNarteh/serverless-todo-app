@@ -10,7 +10,10 @@ import { v4 as uuid } from 'uuid'
 const todosAccess = new TodosAccess()
 
 // // TODO: Implement businessLogic
-export const createTodo = (todoRequest: CreateTodoRequest, userId: string) => {
+export const createTodo = async (
+  todoRequest: CreateTodoRequest,
+  userId: string
+) => {
   const todoId = uuid()
   const createdAt = new Date().toISOString()
 
@@ -22,4 +25,8 @@ export const createTodo = (todoRequest: CreateTodoRequest, userId: string) => {
     done: false,
     attachmentUrl: ''
   })
+}
+
+export const getTodosForUser = (userId: string) => {
+  return todosAccess.getAllTodosByUser(userId)
 }
