@@ -74,4 +74,24 @@ export class TodosAccess {
     const attributes = res.Attributes
     return attributes as TodoUpdate
   }
+
+  async deleteTodo({
+    todoId,
+    userId
+  }: {
+    todoId: string
+    userId: string
+  }): Promise<string> {
+    await this.docClient
+      .delete({
+        TableName: this.todosTable,
+        Key: {
+          todoId,
+          userId
+        }
+      })
+      .promise()
+
+    return '' as string
+  }
 }
