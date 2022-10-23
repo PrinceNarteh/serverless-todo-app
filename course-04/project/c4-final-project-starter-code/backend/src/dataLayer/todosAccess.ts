@@ -7,8 +7,6 @@ import { TodoUpdate } from '../models/TodoUpdate'
 export class TodosAccess {
   constructor(
     private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
-    private readonly s3Bucket = process.env.S3_BUCKET_NAME,
-    private readonly s3Client: Types = new AWS.S3({ signatureVersion: 'v4' }),
     private readonly todosTable = process.env.GROUPS_TABLE
   ) {}
 
@@ -43,11 +41,15 @@ export class TodosAccess {
     return items as TodoItem[]
   }
 
-  async updateTodo(
-    todoUpdate: TodoUpdate,
-    todoId: string,
+  async updateTodo({
+    todoId,
+    todoUpdate,
+    userId
+  }: {
+    todoUpdate: TodoUpdate
+    todoId: string
     userId: string
-  ): Promise<TodoUpdate> {
+  }): Promise<TodoUpdate> {
     const res = await this.docClient
       .update({
         TableName: this.todosTable,
@@ -93,5 +95,18 @@ export class TodosAccess {
       .promise()
 
     return '' as string
+  }
+
+  async generateUploadURL(todoId: string): Promise<string> {
+    const s3BucketName = process.env.S3_BUCKET_NAME
+    const s3Client: Types = new AWS.S3({ signatureVersion: 'v4' })
+
+    const url = s3Client.getSignedUrl('putObject', {
+      Bucket: s3BucketName,
+      Key: todoId,
+      Expires: 1000
+    })
+
+    return url as string
   }
 }
