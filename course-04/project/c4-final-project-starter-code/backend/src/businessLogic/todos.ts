@@ -8,12 +8,14 @@ import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 
 const todosAccess = new TodosAccess()
 
-export const createTodo = async (
-  todoRequest: CreateTodoRequest,
-  jwtToken: string
-): Promise<TodoItem> => {
+export const createTodo = async ({
+  createTodoRequest,
+  userId
+}: {
+  createTodoRequest: CreateTodoRequest
+  userId: string
+}): Promise<TodoItem> => {
   const todoId = uuid()
-  const userId = parseUserId(jwtToken)
   const s3Bucket = process.env.S3_BUCKET_NAME
   const createdAt = new Date().toISOString()
 
@@ -21,7 +23,7 @@ export const createTodo = async (
     userId,
     todoId,
     createdAt,
-    ...todoRequest,
+    ...createTodoRequest,
     done: false,
     attachmentUrl: `https://${s3Bucket}.s3.amazonaws.com/${todoId}`
   })
