@@ -28,6 +28,7 @@ export const createTodo = async (
   })
 }
 
-export const getTodosForUser = (userId: string) => {
+export const getTodosForUser = (jwtToken: string) => {
+  const userId = parseUserId(jwtToken)
   return todosAccess.getAllTodosByUser(userId)
 }
