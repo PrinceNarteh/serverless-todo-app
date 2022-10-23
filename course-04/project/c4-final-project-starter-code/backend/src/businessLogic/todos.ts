@@ -34,14 +34,14 @@ export const getTodosForUser = (userId: string): Promise<TodoItem[]> => {
 
 export const updateTodo = ({
   todoId,
-  todoUpdateRequest,
+  updateTodoRequest,
   userId
 }: {
-  todoUpdateRequest: UpdateTodoRequest
+  updateTodoRequest: UpdateTodoRequest
   todoId: string
   userId: string
 }): Promise<TodoUpdate> => {
-  return todosAccess.updateTodo({ todoId, todoUpdateRequest, userId })
+  return todosAccess.updateTodo({ todoId, updateTodoRequest, userId })
 }
 
 export const deleteTodo = ({
