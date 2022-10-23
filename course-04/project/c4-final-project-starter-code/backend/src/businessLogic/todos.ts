@@ -39,3 +39,11 @@ export const updateTodo = (
   const userId = parseUserId(jwtToken)
   return todosAccess.updateTodo(updateTodoRequest, todoId, userId)
 }
+
+export const deleteTodo = (
+  todoId: string,
+  jwtToken: string
+): Promise<string> => {
+  const userId = parseUserId(jwtToken)
+  return todosAccess.deleteTodo(todoId, userId)
+}
