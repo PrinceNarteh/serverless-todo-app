@@ -1,9 +1,9 @@
+import { v4 as uuid } from 'uuid'
+import { parseUserId } from '../auth/utils'
 import { TodosAccess } from '../dataLayer/todosAccess'
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-import { v4 as uuid } from 'uuid'
-import { parseUserId } from '../auth/utils'
 
 const todosAccess = new TodosAccess()
 
@@ -46,4 +46,8 @@ export const deleteTodo = (
 ): Promise<string> => {
   const userId = parseUserId(jwtToken)
   return todosAccess.deleteTodo(todoId, userId)
+}
+
+export const generateUploadURL = (todoId: string): Promise<string> => {
+  return todosAccess.generateUploadURL(todoId)
 }
