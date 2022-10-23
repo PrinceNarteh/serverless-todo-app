@@ -1,42 +1,28 @@
 import * as AWS from 'aws-sdk'
-const AWSXRay = require('aws-xray-sdk')
+import {Types} from "aws-sdk/clients/s3" 
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
-// import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
-// import { TodoUpdate } from '../models/TodoUpdate'
+import { TodoUpdate } from '../models/TodoUpdate'
 
-const XAWS = AWSXRay.captureAWS(AWS)
-
-// const logger = createLogger('TodosAccess')
-
-function createDynamoDBClient() {
-  if (process.env.IS_OFFLINE) {
-    console.log('Creating a local DynamoDB instance')
-
-    return new XAWS.DynamoDB({
-      region: 'localhost',
-      endpoint: 'http://localhost:8000'
-    })
-  }
-
-  return new XAWS.DynamoDB()
-}
 
 export class TodosAccess {
   constructor(
+    private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
+    private readonly s3Bucket = process.env.S3_BUCKET_NAME,
+    private readonly s3Client: Types = new AWS.S3({signatureVersion: 'v4'}),
     private readonly todosTable = process.env.GROUPS_TABLE,
-    private readonly docClient: DocumentClient = createDynamoDBClient()
   ) {}
 
-  createTodo = async (todo: TodoItem): Promise<TodoItem> => {
+  createTodo = async (todoItem: TodoItem): Promise<TodoItem> => {
+    
     await this.docClient
       .put({
         TableName: this.todosTable,
-        Item: todo
+        Item: todoItem
       })
       .promise()
 
-    return todo
+    return todoItem as TodoItem
   }
 
   async getAllTodosByUser(userId: string): Promise<TodoItem[]> {
