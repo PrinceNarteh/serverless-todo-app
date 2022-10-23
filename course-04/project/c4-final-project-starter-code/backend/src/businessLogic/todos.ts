@@ -1,5 +1,4 @@
 import { v4 as uuid } from 'uuid'
-import { parseUserId } from '../auth/utils'
 import { TodosAccess } from '../dataLayer/todosAccess'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
@@ -29,17 +28,19 @@ export const createTodo = async ({
   })
 }
 
-export const getTodosForUser = (jwtToken: string): Promise<TodoItem[]> => {
-  const userId = parseUserId(jwtToken)
+export const getTodosForUser = (userId: string): Promise<TodoItem[]> => {
   return todosAccess.getAllTodosByUser(userId)
 }
 
-export const updateTodo = (
-  todoUpdateRequest: UpdateTodoRequest,
-  todoId: string,
-  jwtToken: string
-): Promise<TodoUpdate> => {
-  const userId = parseUserId(jwtToken)
+export const updateTodo = ({
+  todoId,
+  todoUpdateRequest,
+  userId
+}: {
+  todoUpdateRequest: UpdateTodoRequest
+  todoId: string
+  userId: string
+}): Promise<TodoUpdate> => {
   return todosAccess.updateTodo({ todoId, todoUpdateRequest, userId })
 }
 
