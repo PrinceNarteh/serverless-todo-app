@@ -1,9 +1,7 @@
 import { TodosAccess } from '../dataLayer/todosAccess'
-// import { AttachmentUtils } from './attachmentUtils';
-// import { TodoItem } from '../models/TodoItem'
+import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
-// import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
-// import { createLogger } from '../utils/logger'
+import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { v4 as uuid } from 'uuid'
 import { parseUserId } from '../auth/utils'
 
@@ -12,7 +10,7 @@ const todosAccess = new TodosAccess()
 export const createTodo = async (
   todoRequest: CreateTodoRequest,
   jwtToken: string
-) => {
+): Promise<TodoItem> => {
   const todoId = uuid()
   const userId = parseUserId(jwtToken)
   const s3Bucket = process.env.S3_BUCKET_NAME
@@ -28,7 +26,16 @@ export const createTodo = async (
   })
 }
 
-export const getTodosForUser = (jwtToken: string) => {
+export const getTodosForUser = (jwtToken: string): Promise<TodoItem[]> => {
   const userId = parseUserId(jwtToken)
   return todosAccess.getAllTodosByUser(userId)
+}
+
+export const updateTodo = (
+  updateTodoRequest: UpdateTodoRequest,
+  todoId: string,
+  jwtToken: string
+): Promise<TodoItem> => {
+  const userId = parseUserId(jwtToken)
+  return todosAccess.updateTodo(updateTodoRequest, todoId, userId)
 }
