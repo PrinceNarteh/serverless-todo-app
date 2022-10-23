@@ -5,11 +5,9 @@ import { CreateTodoRequest } from '../requests/CreateTodoRequest'
 // import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 // import { createLogger } from '../utils/logger'
 import { v4 as uuid } from 'uuid'
-// import * as createError from 'http-errors'
 
 const todosAccess = new TodosAccess()
 
-// // TODO: Implement businessLogic
 export const createTodo = async (
   todoRequest: CreateTodoRequest,
   userId: string

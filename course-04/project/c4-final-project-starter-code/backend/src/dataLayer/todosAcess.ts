@@ -55,4 +55,11 @@ export class TodosAccess {
     const items = result.Items
     return items as TodoItem[]
   }
+
+  async getTodoById(todoId: string): Promise<TodoItem> {
+    const result = await this.docClient.query({
+      TableName: this.todosTable
+    })
+    return result.
+  }
 }
