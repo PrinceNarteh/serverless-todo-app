@@ -43,10 +43,10 @@ export class TodosAccess {
 
   async updateTodo({
     todoId,
-    todoUpdate,
+    todoUpdateRequest,
     userId
   }: {
-    todoUpdate: TodoUpdate
+    todoUpdateRequest: TodoUpdate
     todoId: string
     userId: string
   }): Promise<TodoUpdate> {
@@ -65,9 +65,9 @@ export class TodosAccess {
           '#done': 'done'
         },
         ExpressionAttributeValues: {
-          ':name': todoUpdate['name'],
-          ':dueDate': todoUpdate['dueDate'],
-          ':done': todoUpdate['done']
+          ':name': todoUpdateRequest['name'],
+          ':dueDate': todoUpdateRequest['dueDate'],
+          ':done': todoUpdateRequest['done']
         },
         ReturnValues: 'ALL_NEW'
       })
