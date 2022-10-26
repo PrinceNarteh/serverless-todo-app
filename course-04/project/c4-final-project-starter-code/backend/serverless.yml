@@ -19,12 +19,12 @@ provider:
     apiGateway: true
 
   # Use these variables in the functions and resources section below. For example,
-  # ${self:provider.environment.ATTACHMENT_S3_BUCKET}
+  # ${self:provider.environment.S3_BUCKET_NAME}
   environment:
     PROJECT_NAME: Udagram
     TODOS_TABLE: Todos-${self:provider.stage}
     TODOS_CREATED_AT_INDEX: CreatedAtIndex
-    ATTACHMENT_S3_BUCKET: serverless-2056377-todo-images-${self:provider.stage}
+    S3_BUCKET_NAME: serverless-2056377-todo-images-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
     AUTH_0_SECRET_ID: acRTdB86hf6GCBf3UfhZEbCbXDwfDarzwHDtnLrbDHglJy1dzN200NPGLSGjKTqo
 
@@ -186,7 +186,7 @@ functions:
         Action:
           - s3:*
           - xray:PutTraceSegments
-        Resource: arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*
+        Resource: arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*
 
 resources:
   Resources:
@@ -216,7 +216,7 @@ resources:
     AttachmentsBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:provider.environment.ATTACHMENT_S3_BUCKET}
+        BucketName: ${self:provider.environment.S3_BUCKET_NAME}
         CorsConfiguration:
           CorsRules:
             - AllowedOrigins:
@@ -273,5 +273,5 @@ resources:
               Effect: Allow
               Principal: '*'
               Action: 's3:GetObject'
-              Resource: 'arn:aws:s3:::${self:provider.environment.ATTACHMENT_S3_BUCKET}/*'
+              Resource: 'arn:aws:s3:::${self:provider.environment.S3_BUCKET_NAME}/*'
         Bucket: !Ref AttachmentsBucket
