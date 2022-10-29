@@ -7,6 +7,8 @@ plugins:
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
   - serverless-aws-documentation
+  - serverless-dynamodb-local
+  - serverless-offline
 
 provider:
   name: aws
@@ -41,6 +43,17 @@ provider:
             - xray:PutTraceSegments
           Resource: '*'
 custom:
+  serverless-offline:
+    port: 4000
+
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+    stages: # Add this section of the config
+      - dev
+
   documentation:
     api:
       info:

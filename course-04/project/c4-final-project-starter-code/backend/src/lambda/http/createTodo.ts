@@ -11,7 +11,7 @@ export const handler = middy(
     const userId = getUserId(event)
     const createTodoRequest: CreateTodoRequest = JSON.parse(event.body)
 
-    const createdTodo = createTodo({
+    const createdTodo = await createTodo({
       createTodoRequest,
       userId
     })

@@ -28,11 +28,11 @@ export const createTodo = async ({
   })
 }
 
-export const getTodosForUser = (userId: string): Promise<TodoItem[]> => {
+export const getTodosForUser = async (userId: string): Promise<TodoItem[]> => {
   return todosAccess.getAllTodosByUser(userId)
 }
 
-export const updateTodo = ({
+export const updateTodo = async ({
   todoId,
   updateTodoRequest,
   userId
@@ -44,7 +44,7 @@ export const updateTodo = ({
   return todosAccess.updateTodo({ todoId, updateTodoRequest, userId })
 }
 
-export const deleteTodo = ({
+export const deleteTodo = async ({
   todoId,
   userId
 }: {

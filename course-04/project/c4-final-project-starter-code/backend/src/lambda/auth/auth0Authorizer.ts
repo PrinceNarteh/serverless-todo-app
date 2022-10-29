@@ -2,9 +2,10 @@ import { CustomAuthorizerEvent, CustomAuthorizerResult } from 'aws-lambda'
 import 'source-map-support/register'
 
 import Axios from 'axios'
-import { verify } from 'jsonwebtoken'
+import { verify, decode } from 'jsonwebtoken'
 import { JwtPayload } from '../../auth/JwtPayload'
 import { createLogger } from '../../utils/logger'
+import { Jwt } from '../../auth/Jwt'
 
 const logger = createLogger('auth')
 const jwksUrl = 'https://dev-5sxcycy5.us.auth0.com/.well-known/jwks.json'
@@ -52,18 +53,26 @@ export const handler = async (
 }
 
 async function verifyToken(authHeader: string): Promise<JwtPayload> {
+  logger.info('Start VerifyToken')
+  const token = getToken(authHeader)
+  const jwt: Jwt = decode(token, { complete: true }) as Jwt
+  const jwtKid = jwt.header.kid
+  let cert: string
+
   try {
-    const token = getToken(authHeader)
-    const res = await Axios.get(jwksUrl)
+    const jwks = await Axios.get(jwksUrl)
+    const jwtSigningKey = jwks.data.keys.filter((key) => key.kid === jwtKid)[0]
 
-    // You can read more about how to do this here: https://auth0.com/blog/navigating-rs256-and-jwks/
-    const pemData = res['data']['keys'][0]['x5c'][0]
-    const cert = `-----BEGIN CERTIFICATE-----\n${pemData}\n-----END CERTIFICATE-----`
+    if (!jwtSigningKey) {
+      throw new Error(`Can not find a signing key match with '${jwtKid}'`)
+    }
+    const { x5c } = jwtSigningKey
 
-    return verify(token, cert, { algorithms: ['RS256'] }) as JwtPayload
-  } catch (err) {
-    logger.error('Fail to authenticate', err)
+    cert = `-----BEGIN CERTIFICATE-----\n${x5c[0]}\n-----END CERTIFICATE-----`
+  } catch (error) {
+    console.log('Getting Certificate error : ', error)
   }
+  return verify(token, cert, { algorithms: ['RS256'] }) as JwtPayload
 }
 
 function getToken(authHeader: string): string {
