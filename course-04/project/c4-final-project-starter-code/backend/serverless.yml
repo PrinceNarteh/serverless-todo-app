@@ -6,6 +6,7 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-plugin-tracing
+  - serverless-reqvalidator-plugin
   - serverless-aws-documentation
   - serverless-dynamodb-local
   - serverless-offline
@@ -44,7 +45,7 @@ provider:
           Resource: '*'
 custom:
   serverless-offline:
-    port: 4000
+    httpPort: 4000
 
   dynamodb:
     start:
@@ -60,34 +61,15 @@ custom:
         version: '1.0.0'
         title: serverless-api
         description: serverless-api
+
     models:
       - name: CreateTodoRequest
         contentType: 'application/json'
-        schema:
-          required:
-            - name
-            - dueDate
-          properties:
-            name:
-              minLength: 1
-              type: string
-            dueDate:
-              type: string
+        schema: ${file(models/create-todo-model.json)}
+
       - name: UpdateTodoRequest
         contentType: 'application/json'
-        schema:
-          required:
-            - name
-            - dueDate
-            - done
-          properties:
-            name:
-              minLength: 1
-              type: string
-            dueDate:
-              type: string
-            done:
-              type: boolean
+        schema: ${file(models/update-todo-model.json)}
 
 functions:
   Auth:

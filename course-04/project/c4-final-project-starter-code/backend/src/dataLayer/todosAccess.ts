@@ -1,16 +1,16 @@
 import * as AWS from 'aws-sdk'
-const AWSXRay = require('aws-xray-sdk')
-import { Types } from 'aws-sdk/clients/s3'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
+const AWSXRay = require('aws-xray-sdk')
 
 const XAWS = AWSXRay.captureAWS(AWS)
 
 export class TodosAccess {
   constructor(
     private readonly docClient: DocumentClient = createDynamoDBClient(),
-    private readonly todosTable = process.env.TODOS_TABLE
+    private readonly todosTable = process.env.TODOS_TABLE,
+    private readonly indexTodos = process.env.TODOS_CREATED_AT_INDEX
   ) {}
 
   createTodo = async (todoItem: TodoItem): Promise<TodoItem> => {
@@ -22,6 +22,23 @@ export class TodosAccess {
       .promise()
 
     return todoItem as TodoItem
+  }
+
+  //get all todos by todoID
+  async getTodoById(todoId: string): Promise<TodoItem> {
+    const output = await this.docClient
+      .query({
+        TableName: this.todosTable,
+        IndexName: this.indexTodos,
+        KeyConditionExpression: 'todoId = :todoId',
+        ExpressionAttributeValues: {
+          ':todoId': todoId
+        }
+      })
+      .promise()
+    const item = output.Items
+    const result = item.length !== 0 ? (item[0] as TodoItem) : null
+    return result
   }
 
   async getAllTodosByUser(userId: string): Promise<TodoItem[]> {
@@ -100,17 +117,21 @@ export class TodosAccess {
     return '' as string
   }
 
-  async generateUploadURL(todoId: string): Promise<string> {
-    const s3BucketName = process.env.S3_BUCKET_NAME
-    const s3Client: Types = new AWS.S3({ signatureVersion: 'v4' })
-
-    const url = s3Client.getSignedUrl('putObject', {
-      Bucket: s3BucketName,
-      Key: todoId,
-      Expires: 1000
-    })
-
-    return url as string
+  async addAttachment(todo: TodoItem): Promise<TodoItem> {
+    const result = await this.docClient
+      .update({
+        TableName: this.todosTable,
+        Key: {
+          userId: todo.userId,
+          todoId: todo.todoId
+        },
+        UpdateExpression: 'set attachmentUrl = :attachmentUrl',
+        ExpressionAttributeValues: {
+          ':attachmentUrl': todo.attachmentUrl
+        }
+      })
+      .promise()
+    return result.Attributes as TodoItem
   }
 }
 
