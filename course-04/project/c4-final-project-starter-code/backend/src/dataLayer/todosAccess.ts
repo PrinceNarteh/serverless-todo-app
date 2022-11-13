@@ -131,6 +131,7 @@ export class TodosAccess {
         }
       })
       .promise()
+
     return result.Attributes as TodoItem
   }
 }
